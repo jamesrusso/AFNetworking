@@ -69,6 +69,13 @@ static id AFPublicKeyForCertificate(NSData *certificate) {
     return (__bridge_transfer id)allowedPublicKey;
 }
 
+
+
+static BOOL AFServerTrustIsValidWithRootCertficates(SecTrustRef serverTrust, NSArray *rootCertificates) {
+    OSStatus err = SecTrustSetAnchorCertificates(serverTrust, (__bridge CFArrayRef)rootCertificates);
+    return AFServerTrustIsValid(serverTrust);
+}
+
 static BOOL AFServerTrustIsValid(SecTrustRef serverTrust) {
     SecTrustResultType result = 0;
     OSStatus status = SecTrustEvaluate(serverTrust, &result);
@@ -180,7 +187,8 @@ static NSArray * AFPublicKeyTrustChainForServerTrust(SecTrustRef serverTrust) {
 - (BOOL)evaluateServerTrust:(SecTrustRef)serverTrust {
     switch (self.SSLPinningMode) {
         case AFSSLPinningModeNone:
-            return (self.allowInvalidCertificates || AFServerTrustIsValid(serverTrust));
+            return (self.allowInvalidCertificates || AFServerTrustIsValid(serverTrust) || (self.caCertificates &&
+                    AFServerTrustIsValidWithRootCertficates(serverTrust, self.caCertificates));
         case AFSSLPinningModeCertificate: {
             for (NSData *trustChainCertificate in AFCertificateTrustChainForServerTrust(serverTrust)) {
                 if ([self.pinnedCertificates containsObject:trustChainCertificate]) {

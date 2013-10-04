@@ -46,6 +46,13 @@ typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
  */
 @property (nonatomic, strong) NSArray *pinnedCertificates;
 
+
+/**
+ The certificates which will be used as the root of the chain only if the already present certificates fail to provide
+ a chain back to a trusted CA.
+ */
+@property (nonatomic,strong) NSArray *caCertificates;
+
 /**
  Whether or not to trust servers with an invalid or expired SSL certificates. Defaults to `NO`.
  */
