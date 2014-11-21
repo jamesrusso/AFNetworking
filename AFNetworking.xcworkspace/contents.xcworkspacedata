@@ -130,6 +130,12 @@
       <FileRef
          location = "group:UIWebView+AFNetworking.m">
       </FileRef>
+      <FileRef
+         location = "group:UIRefreshControl+AFNetworking.h">
+      </FileRef>
+      <FileRef
+         location = "group:UIRefreshControl+AFNetworking.m">
+      </FileRef>
    </Group>
    <FileRef
       location = "group:Tests/AFNetworking Tests.xcodeproj">
@@ -138,7 +144,7 @@
       location = "group:Example/AFNetworking iOS Example.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:Example/AFNetworking Mac Example.xcodeproj">
+      location = "group:Example/AFNetworking OS X Example.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Tests/Pods/Pods.xcodeproj">

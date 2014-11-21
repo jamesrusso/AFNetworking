@@ -1,6 +1,6 @@
-// AFHTTPSerializationTests.m
+// AFHTTPResponseSerializationTests.m
 //
-// Copyright (c) 2013 AFNetworking (http://afnetworking.com)
+// Copyright (c) 2013-2014 AFNetworking (http://afnetworking.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,30 @@
 
 #import "AFURLResponseSerialization.h"
 
-@interface AFHTTPSerializationTests : AFTestCase
+@interface AFHTTPResponseSerializationTests : AFTestCase
+@property (nonatomic, strong) AFHTTPResponseSerializer *responseSerializer;
 @end
 
-@implementation AFHTTPSerializationTests
+@implementation AFHTTPResponseSerializationTests
+
+- (void)setUp {
+    [super setUp];
+    self.responseSerializer = [AFHTTPResponseSerializer serializer];
+}
+
+#pragma mark -
 
 - (void)testThatAFHTTPResponseSerializationHandlesAll2XXCodes {
     NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(200, 100)];
     [indexSet enumerateIndexesUsingBlock:^(NSUInteger statusCode, BOOL *stop) {
         NSHTTPURLResponse *response = [[NSHTTPURLResponse alloc] initWithURL:self.baseURL statusCode:statusCode HTTPVersion:@"1.1" headerFields:@{@"Content-Type": @"text/html"}];
 
-        AFHTTPResponseSerializer *serializer = [AFHTTPResponseSerializer serializer];
-        XCTAssert([serializer.acceptableStatusCodes containsIndex:statusCode], @"Status code %d should be acceptable");
+        XCTAssert([self.responseSerializer.acceptableStatusCodes containsIndex:statusCode], @"Status code %@ should be acceptable", @(statusCode));
 
         NSError *error = nil;
-        [serializer validateResponse:response data:[@"text" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+        [self.responseSerializer validateResponse:response data:[@"text" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
 
-        XCTAssertNil(error, @"Error handling status code %d", statusCode);
+        XCTAssertNil(error, @"Error handling status code %@", @(statusCode));
     }];
 }
 
@@ -49,13 +56,12 @@
     [indexSet enumerateIndexesUsingBlock:^(NSUInteger statusCode, BOOL *stop) {
         NSHTTPURLResponse *response = [[NSHTTPURLResponse alloc] initWithURL:self.baseURL statusCode:statusCode HTTPVersion:@"1.1" headerFields:@{@"Content-Type": @"text/html"}];
 
-        AFHTTPResponseSerializer *serializer = [AFHTTPResponseSerializer serializer];
-        XCTAssert(![serializer.acceptableStatusCodes containsIndex:statusCode], @"Status code %d should not be acceptable");
+        XCTAssert(![self.responseSerializer.acceptableStatusCodes containsIndex:statusCode], @"Status code %@ should not be acceptable", @(statusCode));
 
         NSError *error = nil;
-        [serializer validateResponse:response data:[@"text" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+        [self.responseSerializer validateResponse:response data:[@"text" dataUsingEncoding:NSUTF8StringEncoding] error:&error];
 
-        XCTAssertNotNil(error, @"Did not fail handling status code %d",statusCode);
+        XCTAssertNotNil(error, @"Did not fail handling status code %@",@(statusCode));
     }];
 }
 
